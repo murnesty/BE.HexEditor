@@ -1,0 +1,9 @@
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\bin\Debug\Be.Windows.Forms.HexBox.dll
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\bin\Debug\Be.Windows.Forms.HexBox.pdb
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\bin\Debug\Be.Windows.Forms.HexBox.xml
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.HexBox.csprojResolveAssemblyReference.cache
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.HexBox.resources
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.Properties.Resources.resources
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.HexBox.csproj.GenerateResource.Cache
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.HexBox.dll
+D:\GitHub\BE.HexEditor\Be.HexEditor-1.6.0\Be.HexEditor-1.6.0\sources\Be.Windows.Forms.HexBox\obj\Debug\Be.Windows.Forms.HexBox.pdb
