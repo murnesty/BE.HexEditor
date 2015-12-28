@@ -915,19 +915,6 @@
             Contains string format information for hex values
             </summary>
         </member>
-        <member name="F:Be.Windows.Forms.HexBox._dispBitLength">
-            <summary>
-            Hex String bit length to display, 8,16,32,64
-            </summary>
-        </member>
-        <member name="F:Be.Windows.Forms.HexBox._isBigEndian">
-            <summary>
-            Endian, Little Endian/Big Endian
-            Example     : 0x0A0B0C0D
-            Big Endian  : [0] -> [3] = 0A 0B 0C 0D
-            LittleEndian: [0] -> [3] = 0D 0C 0B 0A
-            </summary>
-        </member>
         <member name="F:Be.Windows.Forms.HexBox._keyInterpreter">
             <summary>
             Contains the current key interpreter
@@ -1388,6 +1375,11 @@
         <member name="P:Be.Windows.Forms.HexBox.ByteCharConverter">
             <summary>
             Gets or sets the converter that will translate between byte and character values.
+            </summary>
+        </member>
+        <member name="P:Be.Windows.Forms.HexBox.DispBitLength">
+            <summary>
+            Hex String bit length to display, 8,16,32,64
             </summary>
         </member>
         <member name="M:Be.Windows.Forms.HexBox.ConvertBytesToHex(System.Byte[])">

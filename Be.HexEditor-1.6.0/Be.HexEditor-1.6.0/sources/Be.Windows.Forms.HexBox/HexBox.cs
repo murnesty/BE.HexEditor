@@ -1214,19 +1214,6 @@ namespace Be.Windows.Forms
 		string _hexStringFormat = "X";
 
         /// <summary>
-        /// Hex String bit length to display, 8,16,32,64
-        /// </summary>
-        int _dispBitLength = 8;
-
-        /// <summary>
-        /// Endian, Little Endian/Big Endian
-        /// Example     : 0x0A0B0C0D
-        /// Big Endian  : [0] -> [3] = 0A 0B 0C 0D
-        /// LittleEndian: [0] -> [3] = 0D 0C 0B 0A
-        /// </summary>
-        bool _isBigEndian = true;
-
-        /// <summary>
         /// Contains the current key interpreter
         /// </summary>
         IKeyInterpreter _keyInterpreter;
@@ -2424,11 +2411,19 @@ namespace Be.Windows.Forms
 
 		void PaintHeaderRow(Graphics g)
 		{
+            int byteLength = _dispBitLength / 8;
+            byte[] b = new byte[byteLength];
+
 			Brush brush = new SolidBrush(this.InfoForeColor);
-			for (int col = 0; col < _iHexMaxHBytes; col++)
+			for (int col = 0; col < _iHexMaxHBytes; col+= byteLength)
 			{
-				PaintColumnInfo(g, (byte)col, brush, col);
-			}
+                //PaintColumnInfo(g, (byte)col, brush, col);
+                for(int j = 0; j<byteLength; j++)
+                {
+                    b[j] = (byte)(col + j);
+                }
+                PaintColumnInfo(g, b, byteLength, brush, col);
+            }
 		}
 
 		void PaintColumnSeparator(Graphics g)
@@ -2507,7 +2502,25 @@ namespace Be.Windows.Forms
 			g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
 		}
 
-		void PaintColumnInfo(Graphics g, byte b, Brush brush, int col)
+        void PaintColumnInfo(Graphics g, byte[] b, int length, Brush brush, int col)
+        {
+            PointF headerPointF = GetColumnInfoPointF(col);
+
+            string sB = ConvertByteToHex(b[0]);
+            g.DrawString(sB.Substring(0, 1), Font, brush, headerPointF, _stringFormat);
+            headerPointF.X += _charSize.Width;
+            g.DrawString(sB.Substring(1, 1), Font, brush, headerPointF, _stringFormat);
+            for (int i = 1; i < length; i++)
+            {
+                sB = ConvertByteToHex(b[i]);
+
+                headerPointF.X += _charSize.Width;
+                g.DrawString(sB.Substring(0, 1), Font, brush, headerPointF, _stringFormat);
+                headerPointF.X += _charSize.Width;
+                g.DrawString(sB.Substring(1, 1), Font, brush, headerPointF, _stringFormat);
+            }
+        }
+        void PaintColumnInfo(Graphics g, byte b, Brush brush, int col)
 		{
 			PointF headerPointF = GetColumnInfoPointF(col);
 
@@ -2518,7 +2531,30 @@ namespace Be.Windows.Forms
 			g.DrawString(sB.Substring(1, 1), Font, brush, headerPointF, _stringFormat);
 		}
 
-		void PaintHexStringSelected(Graphics g, byte b, Brush brush, Brush brushBack, Point gridPoint)
+        void PaintHexStringSelected(Graphics g, byte[] b, int length, Brush brush, Brush brushBack, Point gridPoint)
+        {
+            PointF bytePointF = GetBytePointF(gridPoint);
+
+            for (int i = 0; i < length; i++)
+            {
+                string sB = b[i].ToString(_hexStringFormat, System.Threading.Thread.CurrentThread.CurrentCulture);
+                if (sB.Length == 1)
+                    sB = "0" + sB;
+
+                bool isLastLineChar = (gridPoint.X + 1 == _iHexMaxHBytes);
+                float bcWidth = (isLastLineChar) ? _charSize.Width * 2 : _charSize.Width * 3;
+
+                if (i != 0)
+                {
+                    bytePointF.X += _charSize.Width;
+                }
+                g.FillRectangle(brushBack, bytePointF.X, bytePointF.Y, bcWidth, _charSize.Height);
+                g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
+                bytePointF.X += _charSize.Width;
+                g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
+            }
+        }
+        void PaintHexStringSelected(Graphics g, byte b, Brush brush, Brush brushBack, Point gridPoint)
 		{
 			string sB = b.ToString(_hexStringFormat, System.Threading.Thread.CurrentThread.CurrentCulture);
 			if (sB.Length == 1)
@@ -2541,23 +2577,25 @@ namespace Be.Windows.Forms
 			Brush selBrush = new SolidBrush(_selectionForeColor);
 			Brush selBrushBack = new SolidBrush(_selectionBackColor);
 
-			int counter = -2;
+            int dispByteLength = _dispBitLength / 8;
+            int counter = 0- dispByteLength;
 			long intern_endByte = Math.Min(_byteProvider.Length - 1, endByte + _iHexMaxHBytes);
 
 			bool isKeyInterpreterActive = _keyInterpreter == null || _keyInterpreter.GetType() == typeof(KeyInterpreter);
 			bool isStringKeyInterpreterActive = _keyInterpreter != null && _keyInterpreter.GetType() == typeof(StringKeyInterpreter);
-            
-			for (long i = startByte; i < intern_endByte + 1; i+=2)
+
+
+			for (long i = startByte; i < intern_endByte + 1; i+= dispByteLength)
 			// (long i = startByte; i < intern_endByte + 1; i++)
 			{
-				counter+=2;
+				counter+= dispByteLength;
 				Point gridPoint = GetGridBytePoint(counter);
 				PointF byteStringPointF = GetByteStringPointF(gridPoint);
 				byte b = _byteProvider.ReadByte(i);
                 long length = intern_endByte + 1 - i;
-                if(length > 2)
+                if(length > dispByteLength)
                 {
-                    length = 2;
+                    length = dispByteLength;
                 }
                 byte[] b2 = new byte[length];
                 for (int j = 0; j < length; j++)
@@ -2569,8 +2607,9 @@ namespace Be.Windows.Forms
 
 				if (isSelectedByte && isKeyInterpreterActive)
 				{
-					PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
-				}
+					//PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
+                    PaintHexStringSelected(g, b2, (int)length, selBrush, selBrushBack, gridPoint);
+                }
 				else
                 {
                     //PaintHexString(g, b, brush, gridPoint);
@@ -3585,15 +3624,46 @@ namespace Be.Windows.Forms
 			}
 		} IByteCharConverter _byteCharConverter;
 
-		#endregion
+        /// <summary>
+        /// Hex String bit length to display, 8,16,32,64
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int DispBitLength
+        {
+            get
+            {
+                return _dispBitLength;
+            }
+            set
+            {
+                _dispBitLength = value;
+            }
+        }
+        int _dispBitLength;
 
-		#region Misc
-		/// <summary>
-		/// Converts a byte array to a hex string. For example: {10,11} = "0A 0B"
-		/// </summary>
-		/// <param name="data">the byte array</param>
-		/// <returns>the hex string</returns>
-		string ConvertBytesToHex(byte[] data)
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsBigEndian
+        {
+            get
+            {
+                return _isBigEndian;
+            }
+            set
+            {
+                _isBigEndian = value;
+            }
+        }
+        bool _isBigEndian = true;
+
+        #endregion
+
+        #region Misc
+        /// <summary>
+        /// Converts a byte array to a hex string. For example: {10,11} = "0A 0B"
+        /// </summary>
+        /// <param name="data">the byte array</param>
+        /// <returns>the hex string</returns>
+        string ConvertBytesToHex(byte[] data)
 		{
 			StringBuilder sb = new StringBuilder();
 			foreach (byte b in data)

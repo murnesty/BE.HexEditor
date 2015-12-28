@@ -69,10 +69,18 @@ namespace Be.HexEditor
 
 			encodingToolStripComboBox.Items.Add(defConverter);
 			encodingToolStripComboBox.Items.Add(ebcdicConverter);
+            endianToolStripComboBox.Items.Add("Big Endian");
+            endianToolStripComboBox.Items.Add("Little Endian");
+            bitLenghtToolStripComboBox.Items.Add("8");
+            bitLenghtToolStripComboBox.Items.Add("16");
+            bitLenghtToolStripComboBox.Items.Add("32");
+            bitLenghtToolStripComboBox.Items.Add("64");
 
-			encodingToolStripMenuItem.DropDownItems.Add(miDefault);
+            encodingToolStripMenuItem.DropDownItems.Add(miDefault);
 			encodingToolStripMenuItem.DropDownItems.Add(miEbcdic);
 			encodingToolStripComboBox.SelectedIndex = 0;
+            endianToolStripComboBox.SelectedIndex = 0;
+            bitLenghtToolStripComboBox.SelectedIndex = 0;
 
             UpdateFormWidth();
         }
@@ -542,9 +550,25 @@ namespace Be.HexEditor
 
 			foreach (ToolStripMenuItem encodingMenuItem in encodingToolStripMenuItem.DropDownItems)
 				encodingMenuItem.Checked = (encodingMenuItem.Tag == hexBox.ByteCharConverter);
-		}
+        }
+        void toolStripEndian_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(endianToolStripComboBox.Text == "Big Endian")
+            {
+                hexBox.IsBigEndian = true;
+            }
+            else
+            {
+                hexBox.IsBigEndian = false;
+            }
+        }
+        void toolStripDispBitLength_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(bitLenghtToolStripComboBox.Text != "")
+                hexBox.DispBitLength = Convert.ToInt32(bitLenghtToolStripComboBox.Text);
+        }
 
-		void bitsToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        void bitsToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
 		{
 			UpdateBitControlVisibility();
 		}

@@ -70,6 +70,7 @@ namespace Be.HexEditor
             this.pasteToolStripSplitButton = new Be.HexEditor.Core.ToolStripSplitButtonEx();
             this.pasteToolStripMenuItem1 = new Be.HexEditor.Core.ToolStripMenuItemEx();
             this.pasteHexToolStripMenuItem1 = new Be.HexEditor.Core.ToolStripMenuItemEx();
+            this.bitLenghtToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.encodingToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -80,6 +81,7 @@ namespace Be.HexEditor
             this.hexBox = new Be.Windows.Forms.HexBox();
             this.bitControl1 = new Be.HexEditor.BitControl();
             this.RecentFileHandler = new Be.HexEditor.RecentFileHandler(this.components);
+            this.endianToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -324,6 +326,8 @@ namespace Be.HexEditor
             this.cutToolStripButton,
             this.copyToolStripSplitButton,
             this.pasteToolStripSplitButton,
+            this.endianToolStripComboBox,
+            this.bitLenghtToolStripComboBox,
             this.encodingToolStripComboBox});
             this.toolStrip.Name = "toolStrip";
             // 
@@ -420,6 +424,15 @@ namespace Be.HexEditor
             resources.ApplyResources(this.pasteHexToolStripMenuItem1, "pasteHexToolStripMenuItem1");
             this.pasteHexToolStripMenuItem1.Click += new System.EventHandler(this.pasteHex_Click);
             // 
+            // bitLenghtToolStripComboBox
+            // 
+            this.bitLenghtToolStripComboBox.BackColor = System.Drawing.SystemColors.Control;
+            this.bitLenghtToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.bitLenghtToolStripComboBox.DropDownWidth = 35;
+            this.bitLenghtToolStripComboBox.Name = "bitLenghtToolStripComboBox";
+            resources.ApplyResources(this.bitLenghtToolStripComboBox, "bitLenghtToolStripComboBox"); 
+            this.bitLenghtToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.toolStripDispBitLength_SelectedIndexChanged);
+            // 
             // encodingToolStripComboBox
             // 
             this.encodingToolStripComboBox.BackColor = System.Drawing.SystemColors.Control;
@@ -483,7 +496,6 @@ namespace Be.HexEditor
             this.hexBox.BuiltInContextMenu.SelectAllMenuItemText = resources.GetString("hexBox.BuiltInContextMenu.SelectAllMenuItemText");
             this.hexBox.ColumnInfoVisible = true;
             this.hexBox.HexCasing = Be.Windows.Forms.HexCasing.Lower;
-            this.hexBox.InfoForeColor = System.Drawing.Color.Gray;
             this.hexBox.LineInfoVisible = true;
             this.hexBox.Name = "hexBox";
             this.hexBox.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
@@ -509,6 +521,15 @@ namespace Be.HexEditor
             // RecentFileHandler
             // 
             this.RecentFileHandler.RecentFileToolStripItem = this.recentFilesToolStripMenuItem;
+            // 
+            // endianToolStripComboBox
+            // 
+            this.endianToolStripComboBox.BackColor = System.Drawing.SystemColors.Control;
+            this.endianToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.endianToolStripComboBox.DropDownWidth = 75;
+            this.endianToolStripComboBox.Name = "toolStripComboBox1";
+            resources.ApplyResources(this.endianToolStripComboBox, "toolStripComboBox1");
+            this.endianToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.toolStripEndian_SelectedIndexChanged);
             // 
             // FormHexEditor
             // 
@@ -586,5 +607,7 @@ namespace Be.HexEditor
 		private Core.ToolStripMenuItemEx bitsToolStripMenuItem;
 		private BitControl bitControl1;
 		private System.Windows.Forms.Panel bodyPanel;
+        private System.Windows.Forms.ToolStripComboBox bitLenghtToolStripComboBox;
+        private System.Windows.Forms.ToolStripComboBox endianToolStripComboBox;
     }
 }
