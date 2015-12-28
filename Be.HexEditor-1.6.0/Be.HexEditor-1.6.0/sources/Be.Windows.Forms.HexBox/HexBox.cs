@@ -1213,11 +1213,23 @@ namespace Be.Windows.Forms
 		/// </summary>
 		string _hexStringFormat = "X";
 
+        /// <summary>
+        /// Hex String bit length to display, 8,16,32,64
+        /// </summary>
+        int _dispBitLength = 8;
 
-		/// <summary>
-		/// Contains the current key interpreter
-		/// </summary>
-		IKeyInterpreter _keyInterpreter;
+        /// <summary>
+        /// Endian, Little Endian/Big Endian
+        /// Example     : 0x0A0B0C0D
+        /// Big Endian  : [0] -> [3] = 0A 0B 0C 0D
+        /// LittleEndian: [0] -> [3] = 0D 0C 0B 0A
+        /// </summary>
+        bool _isBigEndian = true;
+
+        /// <summary>
+        /// Contains the current key interpreter
+        /// </summary>
+        IKeyInterpreter _keyInterpreter;
 		/// <summary>
 		/// Contains an empty key interpreter without functionality
 		/// </summary>
@@ -2466,7 +2478,25 @@ namespace Be.Windows.Forms
 			}
 		}
 
-		void PaintHexString(Graphics g, byte b, Brush brush, Point gridPoint)
+        void PaintHexString(Graphics g, byte[] b, long length, Brush brush, Point gridPoint)
+        {
+            PointF bytePointF = GetBytePointF(gridPoint);
+
+            string sB = ConvertByteToHex(b[0]);
+            g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
+            bytePointF.X += _charSize.Width;
+            g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
+            for (long i = 1; i < length; i++)
+            {
+                sB = ConvertByteToHex(b[(int)i]);
+                bytePointF.X += _charSize.Width;
+                g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
+                bytePointF.X += _charSize.Width;
+                g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
+            }
+        }
+
+        void PaintHexString(Graphics g, byte b, Brush brush, Point gridPoint)
 		{
 			PointF bytePointF = GetBytePointF(gridPoint);
 
@@ -2511,28 +2541,40 @@ namespace Be.Windows.Forms
 			Brush selBrush = new SolidBrush(_selectionForeColor);
 			Brush selBrushBack = new SolidBrush(_selectionBackColor);
 
-			int counter = -1;
+			int counter = -2;
 			long intern_endByte = Math.Min(_byteProvider.Length - 1, endByte + _iHexMaxHBytes);
 
 			bool isKeyInterpreterActive = _keyInterpreter == null || _keyInterpreter.GetType() == typeof(KeyInterpreter);
 			bool isStringKeyInterpreterActive = _keyInterpreter != null && _keyInterpreter.GetType() == typeof(StringKeyInterpreter);
-
-			for (long i = startByte; i < intern_endByte + 1; i++)
+            
+			for (long i = startByte; i < intern_endByte + 1; i+=2)
+			// (long i = startByte; i < intern_endByte + 1; i++)
 			{
-				counter++;
+				counter+=2;
 				Point gridPoint = GetGridBytePoint(counter);
 				PointF byteStringPointF = GetByteStringPointF(gridPoint);
 				byte b = _byteProvider.ReadByte(i);
+                long length = intern_endByte + 1 - i;
+                if(length > 2)
+                {
+                    length = 2;
+                }
+                byte[] b2 = new byte[length];
+                for (int j = 0; j < length; j++)
+                {
+                    b2[j] = _byteProvider.ReadByte(i + j);
+                }
 
-				bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
 
 				if (isSelectedByte && isKeyInterpreterActive)
 				{
 					PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
 				}
 				else
-				{
-					PaintHexString(g, b, brush, gridPoint);
+                {
+                    //PaintHexString(g, b, brush, gridPoint);
+                    PaintHexString(g, b2, length, brush, gridPoint);
 				}
 
 				string s = new String(ByteCharConverter.ToChar(b), 1);
