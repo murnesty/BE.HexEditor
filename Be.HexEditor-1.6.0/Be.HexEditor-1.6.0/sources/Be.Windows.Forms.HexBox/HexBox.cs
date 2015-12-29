@@ -2531,7 +2531,7 @@ namespace Be.Windows.Forms
 			g.DrawString(sB.Substring(1, 1), Font, brush, headerPointF, _stringFormat);
 		}
 
-        void PaintHexStringSelected(Graphics g, byte[] b, int length, Brush brush, Brush brushBack, Point gridPoint)
+        void PaintHexStringSelected(Graphics g, byte[] b,  int length, bool[] isSelectedArray, Brush defaultBrush, Brush selectedBrush, Brush selectedBrushBack, Point gridPoint)
         {
             PointF bytePointF = GetBytePointF(gridPoint);
 
@@ -2548,10 +2548,21 @@ namespace Be.Windows.Forms
                 {
                     bytePointF.X += _charSize.Width;
                 }
-                g.FillRectangle(brushBack, bytePointF.X, bytePointF.Y, bcWidth, _charSize.Height);
-                g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
+
+                Brush tmpBrush;
+                if (isSelectedArray[i])
+                {
+                    tmpBrush = selectedBrush;
+                }
+                else
+                {
+                    tmpBrush = defaultBrush;
+                }
+
+                g.FillRectangle(selectedBrushBack, bytePointF.X, bytePointF.Y, bcWidth, _charSize.Height);
+                g.DrawString(sB.Substring(0, 1), Font, tmpBrush, bytePointF, _stringFormat);
                 bytePointF.X += _charSize.Width;
-                g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
+                g.DrawString(sB.Substring(1, 1), Font, tmpBrush, bytePointF, _stringFormat);
             }
         }
         void PaintHexStringSelected(Graphics g, byte b, Brush brush, Brush brushBack, Point gridPoint)
@@ -2602,13 +2613,26 @@ namespace Be.Windows.Forms
                 {
                     b2[j] = _byteProvider.ReadByte(i + j);
                 }
+                if(_isBigEndian)
+                {
+                    Array.Reverse(b2);
+                }
 
-                bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                //bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                bool[] isSelectedArray = new bool[length];
+                bool isSelectedByte = false;
+                for (int j = 0; j < length; j++)
+                {
+                    isSelectedArray[j] = i + j >= _bytePos && i + j <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                    if(isSelectedArray[j])
+                        isSelectedByte = true;
+                }
 
-				if (isSelectedByte && isKeyInterpreterActive)
+                if (isSelectedByte && isKeyInterpreterActive)
 				{
-					//PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
-                    PaintHexStringSelected(g, b2, (int)length, selBrush, selBrushBack, gridPoint);
+                    //PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
+                    //PaintHexStringSelected(g, b2, (int)length, isSelectedArray, brush, selBrush, selBrushBack, gridPoint);
+                    PaintHexStringSelected(g, b2, (int)length, isSelectedArray, selBrush, selBrush, selBrushBack, gridPoint);
                 }
 				else
                 {
@@ -2616,18 +2640,25 @@ namespace Be.Windows.Forms
                     PaintHexString(g, b2, length, brush, gridPoint);
 				}
 
-				string s = new String(ByteCharConverter.ToChar(b), 1);
+                //string s = new String(ByteCharConverter.ToChar(b), 1);
+                for (int j = 0; j < length; j++)
+                {
+                    string s = new String(ByteCharConverter.ToChar(b2[j]), 1);
+                    if (isSelectedByte && isStringKeyInterpreterActive)
+                    {
+                        g.FillRectangle(selBrushBack, byteStringPointF.X, byteStringPointF.Y, _charSize.Width, _charSize.Height);
+                        g.DrawString(s, Font, selBrush, byteStringPointF, _stringFormat);
+                    }
+                    else
+                    {
+                        g.DrawString(s, Font, brush, byteStringPointF, _stringFormat);
+                    }
+                    gridPoint = GetGridBytePoint(counter + j + 1);
+                    byteStringPointF = GetByteStringPointF(gridPoint);
 
-				if (isSelectedByte && isStringKeyInterpreterActive)
-				{
-					g.FillRectangle(selBrushBack, byteStringPointF.X, byteStringPointF.Y, _charSize.Width, _charSize.Height);
-					g.DrawString(s, Font, selBrush, byteStringPointF, _stringFormat);
-				}
-				else
-				{
-					g.DrawString(s, Font, brush, byteStringPointF, _stringFormat);
-				}
-			}
+                }
+
+            }
 		}
 
 		void PaintCurrentBytesSign(Graphics g)
